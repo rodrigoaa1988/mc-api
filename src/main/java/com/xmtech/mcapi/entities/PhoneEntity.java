@@ -1,17 +1,24 @@
-package com.xmtech.mcapi.models;
+package com.xmtech.mcapi.entities;
 
 import java.io.Serializable;
 import java.util.Objects;
+
+import org.modelmapper.ModelMapper;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.xmtech.mcapi.dtos.PhoneDTO;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tb_phone")
-public class Phone implements Serializable{
+public class PhoneEntity implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
@@ -20,17 +27,20 @@ public class Phone implements Serializable{
     private String ddd;
     private String number;
     
-    public Phone() {
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private ClientEntity client;
+    
+    public PhoneEntity() {
     }
 
-	public Phone(Long id, String ddd, String number) {
+	public PhoneEntity(Long id, String ddd, String number, ClientEntity client) {
 		super();
 		this.id = id;
 		this.ddd = ddd;
 		this.number = number;
+		this.client = client;
 	}
-	
-	
 
 	public Long getId() {
 		return id;
@@ -56,6 +66,14 @@ public class Phone implements Serializable{
 		this.number = number;
 	}
 
+	public ClientEntity getClient() {
+		return client;
+	}
+
+	public void setClient(ClientEntity client) {
+		this.client = client;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
@@ -69,11 +87,13 @@ public class Phone implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Phone other = (Phone) obj;
+		PhoneEntity other = (PhoneEntity) obj;
 		return Objects.equals(id, other.id);
 	}
-    
 	
-    
-    
+	public PhoneDTO toDto() {
+		ModelMapper modelMapper = new ModelMapper();
+		return modelMapper.map(this, PhoneDTO.class);
+	}
+
 }
